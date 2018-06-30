@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <style>
+      .map {
+        height: 400px;
+        width: 100%;
+      }
+    </style>
+</head>
+<body>
+  <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+  <div id="map" class="map"></div>
+  <script>
+    map = new OpenLayers.Map("map");
+    map.addLayer(new OpenLayers.Layer.OSM());
+    {% if longitude %}
+    var lonLat = new OpenLayers.LonLat( {{ longitude }}, {{ latitude }} )
+          .transform(
+            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+            map.getProjectionObject() // to Spherical Mercator Projection
+          );
+
+    var zoom=16;
+
+    var markers = new OpenLayers.Layer.Markers( "Markers" );
+    map.addLayer(markers);
+    marker = new OpenLayers.Marker(lonLat);
+    marker.icon.imageDiv.title = "{{ server }}";
+    markers.addMarker(marker);
+
+    map.setCenter (lonLat, zoom);
+    {% else %}
+    map.setCenter (0,0, 15);
+    {% endif %}
+
+  </script>
+    <div>
+      <form>
+        <div>
+          <input type="text" name="uaddress" id="address">
+        </div>
+        <div>
+          <button>Поиск</button>
+        </div>
+        </input>
+      </form>
+    </div>
+{% if error %}
+<div>
+  {{ error }}
+</div>
+{% endif%}
+
+</body></html>
